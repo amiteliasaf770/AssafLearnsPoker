@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PokerPro Master - Ultimate Edition with AI Coach</title>
+    <title>PokerPro Master - Ultimate Pro Edition</title>
     <style>
         :root {
             --bg-main: #090d16;
@@ -80,8 +80,8 @@
             background: linear-gradient(135deg, #2563eb, #1d4ed8);
             color: white;
             border: none;
-            padding: 13px;
-            font-size: 0.9rem;
+            padding: 12px;
+            font-size: 0.88rem;
             font-weight: bold;
             border-radius: 12px;
             cursor: pointer;
@@ -94,11 +94,12 @@
         .menu-btn.advanced { background: linear-gradient(135deg, #9333ea, #7e22ce); }
         .menu-btn.puzzle { background: linear-gradient(135deg, #d97706, #b45309); }
         .menu-btn.tourney { background: linear-gradient(135deg, #059669, #047857); }
+        .menu-btn.pushfold { background: linear-gradient(135deg, #be123c, #881337); }
 
         .poker-table-card {
             position: relative;
             width: 100%;
-            height: 280px;
+            height: 270px;
             background: radial-gradient(circle, #065f46 0%, #064e3b 70%, #022c22 100%);
             border: 10px solid #361503;
             border-radius: 140px;
@@ -122,7 +123,7 @@
         }
         .opp-1 { top: 8px; left: 15px; }
         .opp-2 { top: 8px; right: 15px; }
-        .opp-3 { top: 100px; right: -15px; }
+        .opp-3 { top: 95px; right: -15px; }
         .opp-4 { bottom: 10px; left: 30px; }
         .opp-5 { bottom: 10px; right: 30px; }
         .opponent.folded { opacity: 0.3; filter: grayscale(1); }
@@ -141,14 +142,14 @@
         .community-cards {
             display: flex;
             gap: 5px;
-            min-height: 48px;
+            min-height: 45px;
             align-items: center;
             margin-bottom: 6px;
         }
 
         .card {
-            width: 34px;
-            height: 48px;
+            width: 32px;
+            height: 46px;
             background: white;
             color: black;
             border-radius: 4px;
@@ -157,14 +158,14 @@
             justify-content: space-between;
             padding: 2px;
             font-weight: bold;
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             box-shadow: 0 3px 5px rgba(0,0,0,0.3);
         }
         .card.red { color: var(--accent-red); }
 
         .player-hand-area {
             position: absolute;
-            bottom: 30px;
+            bottom: 28px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -192,28 +193,27 @@
         .action-btn.raise { background: var(--accent-green); }
         .action-btn.rereise { background: #9333ea; }
 
-        /* אזור צ'ט AI מובנה */
         .ai-chat-box {
             background: var(--surface-card);
             border: 1px solid #334155;
             border-radius: 10px;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            font-size: 0.8rem;
-        }
-        .ai-message-history {
-            max-height: 100px;
-            overflow-y: auto;
+            padding: 8px;
             display: flex;
             flex-direction: column;
             gap: 6px;
+            font-size: 0.78rem;
+        }
+        .ai-message-history {
+            max-height: 80px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
             padding-right: 4px;
         }
         .ai-bubble {
             background: #1e293b;
-            padding: 6px 10px;
+            padding: 5px 8px;
             border-radius: 6px;
             border-left: 3px solid var(--accent);
             line-height: 1.3;
@@ -221,40 +221,37 @@
         .user-bubble {
             background: #2563eb;
             color: white;
-            padding: 6px 10px;
+            padding: 5px 8px;
             border-radius: 6px;
             align-self: flex-end;
             max-width: 85%;
         }
-        .ai-input-row {
-            display: flex;
-            gap: 6px;
-        }
+        .ai-input-row { display: flex; gap: 6px; }
         .ai-input-row input {
             flex: 1;
             background: #0f172a;
             border: 1px solid #475569;
             color: white;
-            padding: 6px 10px;
+            padding: 5px 8px;
             border-radius: 6px;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
         }
         .ai-input-row button {
             background: var(--accent);
             color: #0f172a;
             border: none;
-            padding: 6px 12px;
+            padding: 5px 10px;
             font-weight: bold;
             border-radius: 6px;
             cursor: pointer;
         }
 
-        .stats-dashboard, .achievements-list {
+        .stats-dashboard, .achievements-list, .quests-list {
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
-        .stat-card-item, .achievement-item {
+        .stat-card-item, .achievement-item, .quest-item {
             background: var(--surface-card);
             padding: 10px;
             border-radius: 8px;
@@ -262,7 +259,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
         }
 
         .hidden { display: none !important; }
@@ -282,6 +279,7 @@
                 <option value="zh">中文</option>
             </select>
             <div class="user-stats">
+                <div class="stat-badge">⭐ <span id="user-xp">0</span> XP</div>
                 <div class="stat-badge">💰 <span id="bankroll">1000</span>$</div>
             </div>
         </div>
@@ -291,14 +289,16 @@
 
         <!-- תפריט ראשי -->
         <div id="screen-menu" class="menu-screen">
-            <div style="text-align: center; margin: 4px 0;">
-                <h2 id="ui-menu-heading" style="margin:0; font-size: 1.15rem;">התחל את דרכך למקצוענות</h2>
-                <p id="ui-menu-sub" style="color: var(--text-muted); font-size: 0.78rem;">שוחח עם מאמן ה-AI ושפר את קבלת ההחלטות שלך</p>
+            <div style="text-align: center; margin: 2px 0;">
+                <h2 id="ui-menu-heading" style="margin:0; font-size: 1.1rem;">אקדמיית הפוקר המקצועית</h2>
+                <p id="ui-menu-sub" style="color: var(--text-muted); font-size: 0.75rem;">בחר את מצב האימון שלך והתחל ללמוד ממאמן ה-AI</p>
             </div>
             <button class="menu-btn" onclick="startGameMode('career')" id="ui-btn-career">🎮 משחק קריירה רגיל</button>
             <button class="menu-btn tourney" onclick="startGameMode('tournament')" id="ui-btn-tourney">🏆 סימולטור טורניר (SNG)</button>
+            <button class="menu-btn pushfold" onclick="startPushFoldMode()" id="ui-btn-pushfold">🚀 אתגר אול-אין או קיפול (Push/Fold)</button>
             <button class="menu-btn advanced" onclick="startGameMode('advanced')" id="ui-btn-advanced">⚡ אימון מתקדם (GTO)</button>
             <button class="menu-btn puzzle" onclick="startPuzzleMode()" id="ui-btn-puzzle">🧩 חידת פוקר יומית</button>
+            <button class="menu-btn secondary" onclick="showQuests()" id="ui-btn-quests">🎯 אתגרים יומיים ומשימות</button>
             <button class="menu-btn secondary" onclick="showStats()" id="ui-btn-stats">📊 לוח סטטיסטיקות וניתוח חורים</button>
             <button class="menu-btn secondary" onclick="showAchievements()" id="ui-btn-ach">🏆 הישגים וגביעים (<span id="ach-count">0</span>/4)</button>
         </div>
@@ -306,8 +306,8 @@
         <!-- מסך משחק -->
         <div id="screen-game" class="hidden" style="display: flex; flex-direction: column; gap: 8px;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span id="stage-title" style="color: var(--accent); font-weight: bold; font-size: 0.82rem;">שלב: טרום פלופ</span>
-                <button onclick="backToMenu()" id="ui-btn-back" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.8rem;">🏠 תפריט</button>
+                <span id="stage-title" style="color: var(--accent); font-weight: bold; font-size: 0.8rem;">שלב: טרום פלופ</span>
+                <button onclick="backToMenu()" id="ui-btn-back" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.78rem;">🏠 תפריט</button>
             </div>
 
             <div class="poker-table-card">
@@ -321,7 +321,7 @@
                 <div class="community-cards" id="community-cards"></div>
 
                 <div class="player-hand-area">
-                    <div id="ui-player-tag" style="font-size: 0.6rem; font-weight: bold; background: rgba(0,0,0,0.7); padding: 1px 6px; border-radius: 4px;">אתה (Button)</div>
+                    <div id="ui-player-tag" style="font-size: 0.58rem; font-weight: bold; background: rgba(0,0,0,0.7); padding: 1px 6px; border-radius: 4px;">אתה (Button)</div>
                     <div class="player-cards" id="player-cards"></div>
                 </div>
             </div>
@@ -339,20 +339,29 @@
                     🤖 <span>מאמן ה-AI שלך:</span>
                 </div>
                 <div class="ai-message-history" id="ai-chat-history">
-                    <div class="ai-bubble" id="ai-initial-msg">היד חולקה. שקל את הקלפים והמיקום שלך, ובחר פעולה. לאחר מכן תוכל לדון איתי על השיקולים שלך!</div>
+                    <div class="ai-bubble">היד חולקה. שקל את הקלפים והמיקום שלך, ובחר פעולה.</div>
                 </div>
-                <div class="ai-input-row" id="ai-input-container">
+                <div class="ai-input-row">
                     <input type="text" id="ai-user-input" placeholder="כתוב למאמן את השיקולים שלך..." onkeydown="if(event.key==='Enter') sendUserMessage()">
                     <button onclick="sendUserMessage()" id="ui-btn-send">שלח</button>
                 </div>
             </div>
         </div>
 
+        <!-- מסך משימות ואתגרים יומיים -->
+        <div id="screen-quests" class="hidden" style="display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 id="ui-quests-heading" style="margin:0; font-size:1rem;">🎯 אתגרים יומיים ו-XP</h3>
+                <button onclick="backToMenu()" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">חזור</button>
+            </div>
+            <div class="quests-list" id="quests-container"></div>
+        </div>
+
         <!-- מסך סטטיסטיקות -->
         <div id="screen-stats" class="hidden" style="display: flex; flex-direction: column; gap: 10px;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h3 id="ui-stats-heading" style="margin:0; font-size:1rem;">📊 סטטיסטיקות וניתוח שגיאות</h3>
-                <button onclick="backToMenu()" id="ui-btn-stats-back" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">חזור</button>
+                <h3 id="ui-stats-heading" style="margin:0; font-size:1rem;">📊 סטטיסטיקות וניתוח חורים</h3>
+                <button onclick="backToMenu()" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">חזור</button>
             </div>
             <div class="stats-dashboard" id="stats-container"></div>
         </div>
@@ -361,7 +370,7 @@
         <div id="screen-achievements" class="hidden" style="display: flex; flex-direction: column; gap: 10px;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h3 id="ui-ach-heading" style="margin:0; font-size:1rem;">🏆 הישגים וגביעים</h3>
-                <button onclick="backToMenu()" id="ui-btn-ach-back" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">חזור</button>
+                <button onclick="backToMenu()" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">חזור</button>
             </div>
             <div class="achievements-list" id="achievements-container"></div>
         </div>
@@ -370,6 +379,7 @@
 
     <script>
         let bankroll = localStorage.getItem('poker_bankroll') ? parseInt(localStorage.getItem('poker_bankroll')) : 1000;
+        let userXp = localStorage.getItem('poker_xp') ? parseInt(localStorage.getItem('poker_xp')) : 50;
         let statsData = localStorage.getItem('poker_stats') ? JSON.parse(localStorage.getItem('poker_stats')) : {
             totalHands: 0, correctDecisions: 0, puzzlesSolved: 0, chipsWon: 0, foldErrors: 0, aggressionErrors: 0
         };
@@ -383,7 +393,12 @@
         let currentMode = 'career'; 
         let currentLang = localStorage.getItem('poker_lang') || 'he';
         let tournamentLevel = 1;
-        let lastMoveContext = "";
+
+        let dailyQuests = [
+            { id: 1, title: {he:'שחק 3 ידיים פוקר', ar:'العب 3 أيدي بوكر', en:'Play 3 poker hands', ru:'Сыграть 3 руки', es:'Jugar 3 manos', zh:'玩3手牌'}, progress: 0, target: 3, completed: false, xpReward: 30 },
+            { id: 2, title: {he:'פתר את החידה היומית', ar:'حل اللغز اليومي', en:'Solve daily puzzle', ru:'Решить задачку', es:'Resolver puzzle', zh:'完成每日谜题'}, progress: 0, target: 1, completed: false, xpReward: 50 },
+            { id: 3, title: {he:'בצע החלטה מדויקת במצב מתקדם', ar:'اتخذ قراراً دقيقاً', en:'Make an advanced GTO move', ru:'Сделать GTO ход', es:'Hacer movimiento GTO', zh:'做出GTO决策'}, progress: 0, target: 1, completed: false, xpReward: 40 }
+        ];
 
         function playSound(type) {
             try {
@@ -412,6 +427,7 @@
 
         function saveGameData() {
             localStorage.setItem('poker_bankroll', bankroll);
+            localStorage.setItem('poker_xp', userXp);
             localStorage.setItem('poker_stats', JSON.stringify(statsData));
             localStorage.setItem('poker_lang', currentLang);
         }
@@ -419,12 +435,14 @@
         const translations = {
             he: {
                 title: "♠ PokerPro Master",
-                menuHeading: "התחל את דרכך למקצוענות",
-                menuSub: "שוחח עם מאמן ה-AI ושפר את קבלת ההחלטות שלך",
+                menuHeading: "אקדמיית הפוקר המקצועית",
+                menuSub: "בחר מצב אימון והתחל ללמוד ממאמן ה-AI",
                 btnCareer: "🎮 משחק קריירה רגיל",
                 btnTourney: "🏆 סימולטור טורניר (SNG)",
+                btnPushFold: "🚀 אתגר אול-אין או קיפול (Push/Fold)",
                 btnAdvanced: "⚡ אימון מתקדם (GTO)",
                 btnPuzzle: "🧩 חידת פוקר יומית",
+                btnQuests: "🎯 אתגרים יומיים ומשימות",
                 btnStats: "📊 לוח סטטיסטיקות וניתוח חורים",
                 btnAch: "🏆 הישגים וגביעים",
                 back: "🏠 תפריט",
@@ -440,22 +458,25 @@
                 stageRiver: "שלב: ריבר",
                 statsHeading: "📊 סטטיסטיקות וניתוח שגיאות אישי",
                 achHeading: "🏆 הישגים וגביעים",
-                backBtn: "חזור",
+                questsHeading: "🎯 אתגרים יומיים ו-XP",
                 unlocked: "✅ נפתח",
                 locked: "🔒 נעול",
                 initMsg: "היד חולקה. שקל את הקלפים והמיקום שלך, ובחר פעולה.",
                 puzzleMsg: "🧩 חידה יומית: אתה ב-Big Blind מול Raise מוקדם. יש לך AQ סוטד. מה תעשה?",
+                pushFoldMsg: "🚀 אתגר Push/Fold: אתה ב-Short Stack עם 10 BB ב-Button. יש לך K-Q. האם תדחוף הכל (All-in) או תעשה Fold?",
                 sendBtn: "שלח",
                 inputPh: "כתוב למאמן את השיקולים שלך..."
             },
             ar: {
                 title: "♠ PokerPro Master",
-                menuHeading: "ابدأ طريقك نحو الاحتراف",
-                menuSub: "تحدث مع مدرب الذكاء الاصطناعي وحسن قراراتك",
+                menuHeading: "أكاديمية البوكر الاحترافية",
+                menuSub: "اختر وضع التدريب وابدأ التعلم",
                 btnCareer: "🎮 وضع المهنة العادي",
                 btnTourney: "🏆 محاكي البطولات (SNG)",
+                btnPushFold: "🚀 تحدي دفع أو طي (Push/Fold)",
                 btnAdvanced: "⚡ تدريب متقدم (GTO)",
                 btnPuzzle: "🧩 لغز البوكر اليومي",
+                btnQuests: "🎯 التحديات اليومية والمهام",
                 btnStats: "📊 لوحة الإحصائيات وتحليل الأخطاء",
                 btnAch: "🏆 الإنجازات والجوائز",
                 back: "🏠 القائمة",
@@ -471,22 +492,25 @@
                 stageRiver: "المرحلة: الريفر",
                 statsHeading: "📊 الإحصائيات وتحليل الأخطاء الشخصية",
                 achHeading: "🏆 الإنجازات والجوائز",
-                backBtn: "رجوع",
+                questsHeading: "🎯 التحديات اليومية",
                 unlocked: "✅ مفتوح",
                 locked: "🔒 مقفل",
                 initMsg: "تم توزيع يد جديدة. قم بتقييم أوراقك وموقعك.",
-                puzzleMsg: "🧩 لغز يومي: أنت في الـ BB ضد رفع مبكر. معك AQ suited. ماذا ستفعل؟",
+                puzzleMsg: "🧩 لغز يومي: أنت في الـ BB ضد رفع مبكر. معك AQ suited.",
+                pushFoldMsg: "🚀 تحدي Push/Fold: لديك رصيد قصير 10 BB على الزر مع K-Q. هل تدفع الكل؟",
                 sendBtn: "إرسال",
                 inputPh: "اكتب اعتباراتك للمدرب..."
             },
             en: {
                 title: "♠ PokerPro Master",
-                menuHeading: "Start Your Pro Journey",
-                menuSub: "Chat with the AI Coach and sharpen your decisions",
+                menuHeading: "Professional Poker Academy",
+                menuSub: "Choose your training mode and learn from the AI Coach",
                 btnCareer: "🎮 Standard Career Mode",
                 btnTourney: "🏆 Tournament Simulator (SNG)",
+                btnPushFold: "🚀 Push/Fold Trainer",
                 btnAdvanced: "⚡ Advanced Training (GTO)",
                 btnPuzzle: "🧩 Daily Poker Puzzle",
+                btnQuests: "🎯 Daily Quests & XP",
                 btnStats: "📊 Stats & Leak Finder Dashboard",
                 btnAch: "🏆 Achievements",
                 back: "🏠 Menu",
@@ -502,22 +526,25 @@
                 stageRiver: "Stage: River",
                 statsHeading: "📊 Performance & Leak Analysis",
                 achHeading: "🏆 Achievements",
-                backBtn: "Back",
+                questsHeading: "🎯 Daily Quests & XP",
                 unlocked: "✅ Unlocked",
                 locked: "🔒 Locked",
                 initMsg: "New hand dealt. Evaluate your cards and position.",
                 puzzleMsg: "🧩 Daily Puzzle: You're in BB facing an early raise with AQ suited. What do you do?",
+                pushFoldMsg: "🚀 Push/Fold Drill: Short stack 10 BB on Button with K-Q. Push All-in or Fold?",
                 sendBtn: "Send",
                 inputPh: "Write your thoughts to the coach..."
             },
             ru: {
                 title: "♠ PokerPro Master",
-                menuHeading: "Начните путь к профессионализму",
-                menuSub: "Общайтесь с ИИ-тренером",
+                menuHeading: "Профессиональная академия покера",
+                menuSub: "Выберите режим тренировки",
                 btnCareer: "🎮 Стандартная карьера",
                 btnTourney: "🏆 Турнирный симулятор (SNG)",
+                btnPushFold: "🚀 Пуш/Фолд тренажер",
                 btnAdvanced: "⚡ GTO Тренировка",
                 btnPuzzle: "🧩 Ежедневная задачка",
+                btnQuests: "🎯 Ежедневные задания",
                 btnStats: "📊 Статистика и анализ ошибок",
                 btnAch: "🏆 Достижения",
                 back: "🏠 Меню",
@@ -533,22 +560,25 @@
                 stageRiver: "Этап: Ривер",
                 statsHeading: "📊 Анализ производительности",
                 achHeading: "🏆 Достижения",
-                backBtn: "Назад",
+                questsHeading: "🎯 Задания и XP",
                 unlocked: "✅ Открыто",
                 locked: "🔒 Закрыто",
                 initMsg: "Раздача началась. Оцените карты.",
                 puzzleMsg: "🧩 Задачка дня: Вы на BB против рейза с AQ suited.",
+                pushFoldMsg: "🚀 Пуш/Фолд: Короткий стек 10 BB на баттоне с K-Q. Пуш или фолд?",
                 sendBtn: "Отправить",
                 inputPh: "Напишите тренеру..."
             },
             es: {
                 title: "♠ PokerPro Master",
-                menuHeading: "Comienza tu camino profesional",
-                menuSub: "Chatea con el Entrenador IA",
+                menuHeading: "Academia Profesional de Póker",
+                menuSub: "Elige tu modo de entrenamiento",
                 btnCareer: "🎮 Modo Carrera",
                 btnTourney: "🏆 Simulador de Torneo",
+                btnPushFold: "🚀 Entrenador Push/Fold",
                 btnAdvanced: "⚡ Entrenamiento GTO",
                 btnPuzzle: "🧩 Puzzle Diario",
+                btnQuests: "🎯 Misiones Diarias y XP",
                 btnStats: "📊 Estadísticas y Análisis",
                 btnAch: "🏆 Logros",
                 back: "🏠 Menú",
@@ -564,23 +594,26 @@
                 stageRiver: "Fase: River",
                 statsHeading: "📊 Rendimiento y Fugas",
                 achHeading: "🏆 Logros",
-                backBtn: "Volver",
+                questsHeading: "🎯 Misiones Diarias",
                 unlocked: "✅ Desbloqueado",
                 locked: "🔒 Bloqueado",
                 initMsg: "Nueva mano. Evalúa tus cartas.",
                 puzzleMsg: "🧩 Puzzle diario: Estás en BB con AQ suited.",
+                pushFoldMsg: "🚀 Push/Fold: Short stack 10 BB en Botón con K-Q. ¿All-in o Fold?",
                 sendBtn: "Enviar",
                 inputPh: "Escribe tus pensamientos..."
             },
             zh: {
                 title: "♠ PokerPro Master",
-                menuHeading: "开启您的职业扑克之路",
-                menuSub: "与AI教练对话并提升决策能力",
+                menuHeading: "职业扑克学院",
+                menuSub: "选择训练模式并向AI教练学习",
                 btnCareer: "🎮 标准职业模式",
                 btnTourney: "🏆 锦标赛模拟器",
+                btnPushFold: "🚀 Push/Fold 训练器",
                 btnAdvanced: "⚡ 高级GTO训练",
                 btnPuzzle: "🧩 每日扑克谜题",
-                btnStats: "📊 数据看板",
+                btnQuests: "🎯 每日任务与XP",
+                btnStats: "📊 数据看板与漏洞分析",
                 btnAch: "🏆 成就奖杯",
                 back: "🏠 菜单",
                 potLabel: "底池",
@@ -593,13 +626,14 @@
                 stageFlop: "阶段：翻牌圈",
                 stageTurn: "阶段：转牌圈",
                 stageRiver: "阶段：河牌圈",
-                statsHeading: "📊 个人表现",
+                statsHeading: "📊 个人表现与漏洞分析",
                 achHeading: "🏆 成就与奖杯",
-                backBtn: "返回",
+                questsHeading: "🎯 每日任务",
                 unlocked: "✅ 已解锁",
                 locked: "🔒 未解锁",
                 initMsg: "新牌局已发。请评估手牌与位置。",
-                puzzleMsg: "🧩 每日谜题：你在大盲位面对前位加注。",
+                puzzleMsg: "🧩 每日谜题：你在大盲位面对前位加注，手牌AQ同花。",
+                pushFoldMsg: "🚀 Push/Fold 训练：短筹码 10BB 在庄家位手持 K-Q，all-in 还是 弃牌？",
                 sendBtn: "发送",
                 inputPh: "向教练输入您的思考..."
             }
@@ -627,8 +661,10 @@
             document.getElementById('ui-menu-sub').innerText = t.menuSub;
             document.getElementById('ui-btn-career').innerText = t.btnCareer;
             document.getElementById('ui-btn-tourney').innerText = t.btnTourney;
+            document.getElementById('ui-btn-pushfold').innerText = t.btnPushFold;
             document.getElementById('ui-btn-advanced').innerText = t.btnAdvanced;
             document.getElementById('ui-btn-puzzle').innerText = t.btnPuzzle;
+            document.getElementById('ui-btn-quests').innerText = t.btnQuests;
             document.getElementById('ui-btn-stats').innerText = t.btnStats;
             document.getElementById('ui-btn-ach').innerText = t.btnAch;
             document.getElementById('ui-btn-back').innerText = t.back;
@@ -639,18 +675,18 @@
             document.getElementById('ui-btn-raise').innerText = t.raise;
             document.getElementById('ui-btn-rereise').innerText = t.rereise;
             document.getElementById('ui-stats-heading').innerText = t.statsHeading;
-            document.getElementById('ui-btn-stats-back').innerText = t.backBtn;
+            document.getElementById('ui-quests-heading').innerText = t.questsHeading;
             document.getElementById('ui-ach-heading').innerText = t.achHeading;
-            document.getElementById('ui-btn-ach-back').innerText = t.backBtn;
             document.getElementById('ui-btn-send').innerText = t.sendBtn;
             document.getElementById('ai-user-input').placeholder = t.inputPh;
             document.getElementById('ach-count').innerText = achievements.filter(a => a.unlocked).length;
+            document.getElementById('user-xp').innerText = userXp;
             saveGameData();
         }
 
         function showScreen(screenId) {
             playSound('click');
-            ['screen-menu', 'screen-game', 'screen-stats', 'screen-achievements'].forEach(id => {
+            ['screen-menu', 'screen-game', 'screen-quests', 'screen-stats', 'screen-achievements'].forEach(id => {
                 document.getElementById(id).classList.add('hidden');
             });
             document.getElementById(screenId).classList.remove('hidden');
@@ -672,6 +708,29 @@
             currentMode = 'puzzle';
             showScreen('screen-game');
             startNewHand();
+        }
+
+        function startPushFoldMode() {
+            currentMode = 'pushfold';
+            showScreen('screen-game');
+            startNewHand();
+        }
+
+        function showQuests() {
+            showScreen('screen-quests');
+            const c = document.getElementById('quests-container');
+            c.innerHTML = '';
+            dailyQuests.forEach(q => {
+                c.innerHTML += `
+                    <div class="quest-item">
+                        <div>
+                            <b>${q.title[currentLang]}</b><br>
+                            <span style="font-size:0.75rem; color:var(--text-muted);">התקדמות: ${q.progress}/${q.target} | פרס: +${q.xpReward} XP</span>
+                        </div>
+                        <div>${q.completed ? '✅ בוצע' : '⏳ בתהליך'}</div>
+                    </div>
+                `;
+            });
         }
 
         function showStats() {
@@ -728,11 +787,13 @@
 
             stage = 0;
             const t = translations[currentLang];
-            
             document.getElementById('action-controls').style.display = 'grid';
 
             if (currentMode === 'puzzle') {
                 playerCards = [{ val: 'A', suit: '♠', isRed: false }, { val: 'Q', suit: '♠', isRed: false }];
+                communityCards = [];
+            } else if (currentMode === 'pushfold') {
+                playerCards = [{ val: 'K', suit: '♥', isRed: true }, { val: 'Q', suit: '♦', isRed: true }];
                 communityCards = [];
             } else {
                 playerCards = [deck.pop(), deck.pop()];
@@ -743,9 +804,11 @@
             renderTable();
             document.getElementById('bankroll').innerText = bankroll;
 
-            let initText = currentMode === 'puzzle' ? t.puzzleMsg : t.initMsg;
+            let initText = t.initMsg;
+            if (currentMode === 'puzzle') initText = t.puzzleMsg;
+            if (currentMode === 'pushfold') initText = t.pushFoldMsg;
+
             document.getElementById('ai-chat-history').innerHTML = `<div class="ai-bubble">${initText}</div>`;
-            lastMoveContext = initText;
         }
 
         function simulateOpponents() {
@@ -782,32 +845,67 @@
         function playerMove(action) {
             playSound('click');
             statsData.totalHands++;
+            userXp += 10;
+            document.getElementById('user-xp').innerText = userXp;
+
+            // עדכון משימה יומית ראשונה
+            if (!dailyQuests[0].completed) {
+                dailyQuests[0].progress++;
+                if (dailyQuests[0].progress >= dailyQuests[0].target) {
+                    dailyQuests[0].completed = true;
+                    userXp += dailyQuests[0].xpReward;
+                }
+            }
+
             let isHigh = playerCards[0].val === 'A' || playerCards[0].val === 'K' || playerCards[1].val === 'A' || playerCards[1].val === 'K';
             let isPair = playerCards[0].val === playerCards[1].val;
             
             let feedback = "";
-            if (action === 'raise' || action === 'rereise') {
-                if (isHigh || isPair) {
-                    feedback = "ניתוח AI: בחרת נכון! אגרסיביות עם יד פרימיום במיקום מתקדם ממקסמת ערך.";
+            if (currentMode === 'pushfold') {
+                if (action === 'raise' || action === 'rereise') {
+                    feedback = "ניתוח AI: פוש (Push) מושלם! עם K-Q בסטאק קצר על הבטן, זו החלטת נאש אופטימלית.";
                     statsData.correctDecisions++;
                 } else {
-                    feedback = "ניתוח AI: העלאה עם קלפים חלשים עלולה לחשוף אותך לסיכון מיותר.";
-                    statsData.aggressionErrors++;
-                }
-            } else if (action === 'call') {
-                feedback = "ניתוח AI: השוואה שומרת על קופה קטנה, אך לעיתים עדיף להוביל עם Raise.";
-                statsData.correctDecisions++;
-            } else {
-                if (!isHigh && !isPair) {
-                    feedback = "ניתוח AI: קיפול חכם מאוד. חסכת צ'יפסים יקרים על קלפים חלשים.";
-                    statsData.correctDecisions++;
-                } else {
-                    feedback = "ניתוח AI: פספוס. חבל לקפל יד חזקה כזו בשלב זה.";
+                    feedback = "ניתוח AI: קיפול כאן בסטאק קצר הוא טעות מתמטית לפי טווחי Nash.";
                     statsData.foldErrors++;
+                }
+            } else if (currentMode === 'puzzle') {
+                if (action === 'rereise' || action === 'raise') {
+                    feedback = "ניתוח AI: פתרת את החידה בצורה מושלמת עם 3-Bet!";
+                    statsData.correctDecisions++;
+                    statsData.puzzlesSolved++;
+                    achievements[1].unlocked = true;
+                    if (!dailyQuests[1].completed) {
+                        dailyQuests[1].progress = 1;
+                        dailyQuests[1].completed = true;
+                        userXp += dailyQuests[1].xpReward;
+                    }
+                } else {
+                    feedback = "ניתוח AI: פספוס בחידה היומית.";
+                }
+            } else {
+                if (action === 'raise' || action === 'rereise') {
+                    if (isHigh || isPair) {
+                        feedback = "ניתוח AI: אגרסיביות מצוינת עם יד חזקה!";
+                        statsData.correctDecisions++;
+                    } else {
+                        feedback = "ניתוח AI: סיכון גבוה בהעלאה עם יד חלשה.";
+                        statsData.aggressionErrors++;
+                    }
+                } else if (action === 'call') {
+                    feedback = "ניתוח AI: השוואה סבירה לשמירת קופה קטנה.";
+                    statsData.correctDecisions++;
+                } else {
+                    if (!isHigh && !isPair) {
+                        feedback = "ניתוח AI: קיפול חכם מאוד שחסך צ'יפסים.";
+                        statsData.correctDecisions++;
+                    } else {
+                        feedback = "ניתוח AI: פספוס, חבל לקפל יד טובה.";
+                        statsData.foldErrors++;
+                    }
                 }
             }
 
-            lastMoveContext = feedback;
             const history = document.getElementById('ai-chat-history');
             history.innerHTML += `<div class="ai-bubble">${feedback}</div>`;
             history.scrollTop = history.scrollHeight;
@@ -823,7 +921,6 @@
             }
         }
 
-        // פונקציית צ'ט מענה מה-AI לפי שיקולי המשתמש
         function sendUserMessage() {
             const input = document.getElementById('ai-user-input');
             const text = input.value.trim();
@@ -834,10 +931,7 @@
             input.value = "";
 
             setTimeout(() => {
-                let aiReply = "הבנתי לגמרי את השיקול שלך. בפוקר אכן חשוב לקרוא את הדינמיקה של השולחן ולא רק מתמטיקה יבשה. שים לב שטווחים ארוכים מנצחים מקרים נקודתיים, אבל המשך כך!";
-                if (text.includes("פסיבי") || text.includes("בלוף") || text.includes("זהירות")) {
-                    aiReply = "נקודה מעולה. התאמת האסטרטגיה לסגנון של היריב (Exploitative Play) היא בדיוק מה ששחקנים מקצוענים עושים כשהם מזהים חולשה.";
-                }
+                let aiReply = "הערה מענייنة מאוד! שחקנים מקצוענים שוקלים תמיד את טווחי היריב בהתאם לתגובות כאלה. המשך כך!";
                 history.innerHTML += `<div class="ai-bubble">${aiReply}</div>`;
                 history.scrollTop = history.scrollHeight;
             }, 600);
@@ -861,20 +955,21 @@
                     playSound('win');
                     bankroll += pot;
                     statsData.chipsWon += pot;
-                    history.innerHTML += `<div class="ai-bubble">🏆 כל הכבוד! ניצחת בקופה של ${pot}$. החלטה מצוינת.</div>`;
+                    history.innerHTML += `<div class="ai-bubble">🏆 ניצחת בקופה של ${pot}$!</div>`;
                     achievements[0].unlocked = true;
                     if (currentMode === 'tournament') tournamentLevel++;
                     if (bankroll >= 1500) achievements[2].unlocked = true;
                 } else {
                     playSound('lose');
                     bankroll -= currentBet;
-                    history.innerHTML += `<div class="ai-bubble">💥 היריב הציג יד חזקה יותר בשואודאון. ממשיכים ליד הבאה!</div>`;
+                    history.innerHTML += `<div class="ai-bubble">💥 היריב הציג יד חזקה יותר בשואודאון.</div>`;
                 }
             } else {
                 playSound('lose');
             }
             history.scrollTop = history.scrollHeight;
             document.getElementById('bankroll').innerText = bankroll;
+            document.getElementById('user-xp').innerText = userXp;
             saveGameData();
             setTimeout(startNewHand, 6000);
         }
