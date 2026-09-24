@@ -376,7 +376,7 @@
                 <button onclick="backToMenu()" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">חזור</button>
             </div>
             <div class="settings-box">
-                <p style="margin:0; font-size: 0.8rem; color: var(--text-muted);">הכנס את מפתח ה-Google Gemini API שלך[span_2](start_span)[span_2](end_span) כדי לאפשר למאמן ה-AI לענות לך בצורה חיה. המפתח נשמר בדפדפן שלך בלבד.</p>
+                <p style="margin:0; font-size: 0.8rem; color: var(--text-muted);">הכנס את מפתח ה-Google Gemini API שלך[span_1](start_span)[span_1](end_span) כדי לאפשר למאמן ה-AI לענות לך בצורה חיה. המפתח נשמר בדפדפן שלך בלבד[span_2](start_span)[span_2](end_span).</p>
                 <input type="password" id="user-api-key-input" placeholder="הדבק כאן את מפתח ה-API שלך...">
                 <button class="menu-btn" onclick="saveApiKey()" style="padding: 8px; font-size: 0.8rem;">שמור מפתח</button>
                 <span id="api-save-status" style="font-size: 0.75rem; color: var(--accent-green);"></span>
@@ -970,7 +970,6 @@
             }
         }
 
-        // פונקציית צ'ט חיה מחוברת ל-Gemini API באמצעות המפתח של המשתמש
         async function sendUserMessage() {
             const input = document.getElementById('ai-user-input');
             const text = input.value.trim();
@@ -981,7 +980,7 @@
             input.value = "";
 
             if (!userApiKey) {
-                history.innerHTML += `<div class="ai-bubble" style="color:var(--accent-red);">⚠️ לא הוגדר מפתח API. לחץ על כפתור ההגדרות (⚙️) בראש המסך והכנס את מפתח ה-Gemini שלך כדי לאפשר צ'ט חי.</div>`;
+                history.innerHTML += `<div class="ai-bubble" style="color:var(--accent-red);">⚠️ לא הוגדר מפתח API. לחץ על כפתור ההגדרות (⚙️) בראש המסך והכנס את מפתח ה-Gemini שלך.</div>`;
                 history.scrollTop = history.scrollHeight;
                 return;
             }
@@ -1007,13 +1006,17 @@
                     throw new Error(data.error.message || 'שגיאה במפתח ה-API');
                 }
 
+                if (!data.candidates || !data.candidates[0].content) {
+                    throw new Error('תשובה לא תקינה מהשרת');
+                }
+
                 const aiReply = data.candidates[0].content.parts[0].text;
 
                 document.getElementById(loadingId).remove();
                 history.innerHTML += `<div class="ai-bubble">${aiReply}</div>`;
             } catch (error) {
                 document.getElementById(loadingId).remove();
-                history.innerHTML += `<div class="ai-bubble" style="color:var(--accent-red);">שגיאה בהתחברות ל-Gemini: ודא שמפתח ה-API שהזנת בהגדרות (⚙️) תקין.</div>`;
+                history.innerHTML += `<div class="ai-bubble" style="color:var(--accent-red);">שגיאה: ${error.message || 'ודא שמפתח ה-API תקין ופעיל ב-Google AI Studio.'}</div>`;
             }
             history.scrollTop = history.scrollHeight;
         }
