@@ -1,162 +1,350 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="he" dir="rtl" id="html-root">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>סימולטור ומאמן פוקר מקצועי וזורם</title>
-    <!-- Tailwind CSS for modern responsive styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>PokerPro Master - Ultimate Edition</title>
     <style>
+        :root {
+            --bg-main: #090d16;
+            --surface: #131c31;
+            --surface-card: #1e293b;
+            --accent: #38bdf8;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --accent-gold: #fbbf24;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
         body {
-            font-family: 'Assistant', sans-serif;
-            background-color: #0b0f19;
-            color: #f8fafc;
-            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: system-ui, -apple-system, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
         }
-        /* Custom felt texture gradient for poker table */
-        .poker-table {
-            background: radial-gradient(circle, #065f46 0%, #064e3b 65%, #022c22 100%);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), inset 0 15px 30px rgba(0,0,0,0.8);
-            border: 16px solid #2d1203;
+
+        header {
+            width: 100%;
+            max-width: 480px;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface);
+            border-bottom: 1px solid #334155;
+            box-sizing: border-box;
         }
+
+        h1 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--accent);
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        select.lang-select {
+            background: var(--surface-card);
+            color: var(--text-main);
+            border: 1px solid #334155;
+            padding: 3px 5px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .user-stats {
+            display: flex;
+            gap: 6px;
+            font-size: 0.75rem;
+        }
+
+        .stat-badge {
+            background: var(--surface-card);
+            padding: 3px 6px;
+            border-radius: 6px;
+            border: 1px solid #334155;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 480px;
+            padding: 15px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .menu-screen {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .menu-btn {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            transition: transform 0.1s;
+        }
+        .menu-btn:active { transform: scale(0.98); }
+        .menu-btn.secondary {
+            background: linear-gradient(135deg, #334155, #1e293b);
+            box-shadow: none;
+        }
+        .menu-btn.advanced {
+            background: linear-gradient(135deg, #9333ea, #7e22ce);
+            box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+        }
+        .menu-btn.puzzle {
+            background: linear-gradient(135deg, #d97706, #b45309);
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+        }
+
+        .poker-table-card {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            background: radial-gradient(circle, #065f46 0%, #064e3b 70%, #022c22 100%);
+            border: 10px solid #361503;
+            border-radius: 150px;
+            box-shadow: 0 15px 25px rgba(0,0,0,0.5), inset 0 10px 20px rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 5px;
+        }
+
+        .opponent {
+            position: absolute;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid #475569;
+            padding: 3px 6px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.7rem;
+            width: 80px;
+        }
+        .opp-1 { top: 8px; left: 15px; }
+        .opp-2 { top: 8px; right: 15px; }
+        .opp-3 { top: 110px; right: -15px; }
+        .opp-4 { bottom: 12px; left: 35px; }
+        .opp-5 { bottom: 12px; right: 35px; }
+        .opponent.folded { opacity: 0.3; filter: grayscale(1); }
+
+        .pot-box {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--accent-gold);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            margin-bottom: 6px;
+        }
+
+        .community-cards {
+            display: flex;
+            gap: 5px;
+            min-height: 50px;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
         .card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            width: 36px;
+            height: 50px;
+            background: white;
+            color: black;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 2px;
+            font-weight: bold;
+            font-size: 0.75rem;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.3);
         }
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        .card.red { color: var(--accent-red); }
+
+        .player-hand-area {
+            position: absolute;
+            bottom: 35px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
         }
-        /* Smooth animations for chips and stages */
-        @keyframes pulse-gold {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+        .player-cards { display: flex; gap: 4px; }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
         }
-        .animate-pot {
-            animation: pulse-gold 2s infinite;
+
+        .action-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
         }
+        .action-btn.fold { background: var(--accent-red); }
+        .action-btn.raise { background: var(--accent-green); }
+        .action-btn.rereise { background: #9333ea; }
+
+        .feedback-box {
+            background: var(--surface-card);
+            border: 1px solid #334155;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            line-height: 1.35;
+        }
+
+        .rating-tag {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.7rem;
+            margin-bottom: 4px;
+        }
+        .rate-exc { background: var(--accent-green); color: white; }
+        .rate-good { background: #0284c7; color: white; }
+        .rate-bad { background: var(--accent-red); color: white; }
+
+        .stats-dashboard, .achievements-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .stat-card-item, .achievement-item {
+            background: var(--surface-card);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .hidden { display: none !important; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-between p-4">
+<body>
 
-    <header class="w-full max-w-5xl flex justify-between items-center bg-slate-900/80 backdrop-blur border border-slate-800 p-4 rounded-2xl shadow-xl">
-        <div class="flex items-center gap-3">
-            <div class="bg-amber-500/10 border border-amber-500/30 p-2 rounded-xl text-amber-400 font-bold text-lg">♠ טקסס הולד'ם</div>
-            <div class="text-sm text-slate-400">מהירות זרימה משופרת</div>
-        </div>
-        <div class="flex gap-4 items-center">
-            <div class="bg-slate-800 px-4 py-2 rounded-xl border border-slate-700 text-center">
-                <span class="text-xs text-slate-400 block">הצ'יפס שלך</span>
-                <span id="bankroll" class="text-lg font-extrabold text-emerald-400">1000</span>$
-            </div>
-            <div class="bg-slate-800 px-4 py-2 rounded-xl border border-slate-700 text-center">
-                <span class="text-xs text-slate-400 block">שלב נוכחי</span>
-                <span id="game-stage" class="text-sm font-bold text-sky-400">טרום פלופ (Pre-Flop)</span>
+    <header>
+        <h1 id="ui-app-title">♠ PokerPro Master</h1>
+        <div class="header-controls">
+            <select class="lang-select" id="lang-selector" onchange="changeLanguage(this.value)">
+                <option value="he">עברית</option>
+                <option value="ar">العربية</option>
+                <option value="en">English</option>
+                <option value="ru">Русский</option>
+                <option value="es">Español</option>
+                <option value="zh">中文</option>
+            </select>
+            <div class="user-stats">
+                <div class="stat-badge">💰 <span id="bankroll">1000</span>$</div>
             </div>
         </div>
     </header>
 
-    <main class="w-full max-w-5xl my-4 flex flex-col items-center">
-        <div class="poker-table relative w-full h-[460px] md:h-[500px] rounded-[240px] flex flex-col items-center justify-center">
-            
-            <!-- Virtual Opponents around the table -->
-            <!-- Opponent 1: EP -->
-            <div id="opp-1" class="absolute top-4 left-20 md:left-32 bg-slate-900/90 border border-slate-700 px-3 py-1.5 rounded-xl text-center text-xs w-28 shadow-lg transition-all duration-300">
-                <div class="font-bold text-slate-200">דני (EP)</div>
-                <div class="text-amber-400 font-semibold opp-chips">880$</div>
-                <div class="opp-status text-slate-400 text-[10px]">ממתין...</div>
-            </div>
+    <div class="main-container">
 
-            <!-- Opponent 2: MP -->
-            <div id="opp-2" class="absolute top-4 right-20 md:right-32 bg-slate-900/90 border border-slate-700 px-3 py-1.5 rounded-xl text-center text-xs w-28 shadow-lg transition-all duration-300">
-                <div class="font-bold text-slate-200">שרה (MP)</div>
-                <div class="text-amber-400 font-semibold opp-chips">940$</div>
-                <div class="opp-status text-slate-400 text-[10px]">ממתין...</div>
+        <!-- תפריט ראשי -->
+        <div id="screen-menu" class="menu-screen">
+            <div style="text-align: center; margin: 4px 0;">
+                <h2 id="ui-menu-heading" style="margin:0; font-size: 1.2rem;">התחל את דרכך למקצוענות</h2>
+                <p id="ui-menu-sub" style="color: var(--text-muted); font-size: 0.8rem;">בחר מצב אימון ושפר את כישורי הפוקר שלך</p>
             </div>
-
-            <!-- Opponent 3: MP2 -->
-            <div id="opp-3" class="absolute top-36 -right-2 md:right-4 bg-slate-900/90 border border-slate-700 px-3 py-1.5 rounded-xl text-center text-xs w-28 shadow-lg transition-all duration-300">
-                <div class="font-bold text-slate-200">מיכאל (MP)</div>
-                <div class="text-amber-400 font-semibold opp-chips">1120$</div>
-                <div class="opp-status text-slate-400 text-[10px]">ממתין...</div>
-            </div>
-
-            <!-- Opponent 4: Cutoff -->
-            <div id="opp-4" class="absolute bottom-16 right-16 md:right-28 bg-slate-900/90 border border-slate-700 px-3 py-1.5 rounded-xl text-center text-xs w-28 shadow-lg transition-all duration-300">
-                <div class="font-bold text-slate-200">רון (Cutoff)</div>
-                <div class="text-amber-400 font-semibold opp-chips">750$</div>
-                <div class="opp-status text-slate-400 text-[10px]">ממתין...</div>
-            </div>
-
-            <!-- Opponent 5: SB -->
-            <div id="opp-5" class="absolute bottom-16 left-16 md:left-28 bg-slate-900/90 border border-slate-700 px-3 py-1.5 rounded-xl text-center text-xs w-28 shadow-lg transition-all duration-300">
-                <div class="font-bold text-slate-200">אלון (SB)</div>
-                <div class="text-amber-400 font-semibold opp-chips">985$</div>
-                <div class="opp-status text-slate-400 text-[10px]">ממתין...</div>
-            </div>
-
-            <!-- Opponent 6: BB -->
-            <div id="opp-6" class="absolute top-36 -left-2 md:left-4 bg-slate-900/90 border border-slate-700 px-3 py-1.5 rounded-xl text-center text-xs w-28 shadow-lg transition-all duration-300">
-                <div class="font-bold text-slate-200">יעל (BB)</div>
-                <div class="text-amber-400 font-semibold opp-chips">850$</div>
-                <div class="opp-status text-slate-400 text-[10px]">ממתין...</div>
-            </div>
-
-            <!-- Pot & Community Cards Area -->
-            <div class="flex flex-col items-center z-10">
-                <div class="pot-display animate-pot bg-black/60 border border-amber-500/40 px-5 py-1.5 rounded-full text-amber-300 font-bold text-base mb-3 shadow-md">
-                    קופה ראשית (Pot): <span id="pot-size">45</span>$
-                </div>
-                
-                <div id="community-cards" class="flex gap-2 min-h-[75px] items-center justify-center">
-                    <!-- Cards populated via JS -->
-                </div>
-            </div>
-
-            <!-- Player's Area at Bottom Center of Table -->
-            <div class="absolute bottom-4 flex flex-col items-center z-20">
-                <div class="bg-black/70 border border-slate-700 px-3 py-0.5 rounded-full text-[11px] font-semibold text-emerald-300 mb-1 shadow">
-                    אתה (Button - עמדה אופטימלית)
-                </div>
-                <div id="player-cards" class="flex gap-2">
-                    <!-- Player cards populated via JS -->
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <section class="w-full max-w-5xl flex flex-col gap-3">
-        <!-- Action Controls -->
-        <div id="action-controls" class="flex flex-wrap gap-3 justify-center">
-            <button onclick="handlePlayerAction('fold')" class="bg-red-600 hover:bg-red-500 text-white font-bold px-6 py-2.5 rounded-xl shadow-lg transition transform active:scale-95 flex items-center gap-2">
-                <span>קיפול (Fold)</span>
-            </button>
-            <button onclick="handlePlayerAction('call')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2.5 rounded-xl shadow-lg transition transform active:scale-95 flex items-center gap-2">
-                <span>השוואה (Call)</span>
-            </button>
-            <button onclick="handlePlayerAction('raise')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-2.5 rounded-xl shadow-lg transition transform active:scale-95 flex items-center gap-2">
-                <span>העלאה (Raise)</span>
-            </button>
-            <button onclick="handlePlayerAction('rereise')" class="bg-purple-600 hover:bg-purple-500 text-white font-bold px-6 py-2.5 rounded-xl shadow-lg transition transform active:scale-95 flex items-center gap-2">
-                <span>רייז-נגדי (3-Bet)</span>
-            </button>
+            <button class="menu-btn" onclick="startGameMode('career')" id="ui-btn-career">🎮 משחק קריירה רגיל</button>
+            <button class="menu-btn advanced" onclick="startGameMode('advanced')" id="ui-btn-advanced">⚡ אימון מתקדם (GTO)</button>
+            <button class="menu-btn puzzle" onclick="startPuzzleMode()" id="ui-btn-puzzle">🧩 חידת פוקר יומית</button>
+            <button class="menu-btn secondary" onclick="showStats()" id="ui-btn-stats">📊 לוח סטטיסטיקות וביצועים</button>
+            <button class="menu-btn secondary" onclick="showAchievements()" id="ui-btn-ach">🏆 הישגים וגביעים (<span id="ach-count">0</span>/4)</button>
         </div>
 
-        <!-- AI Coach & Strategy Panel -->
-        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-xl flex flex-col gap-2">
-            <div class="flex items-center justify-between">
-                <div class="text-sky-400 font-bold flex items-center gap-2 text-sm">
-                    <span>💡 מדד מאמן פוקר ודירוג החלטה</span>
-                </div>
-                <div id="rating-badge-container">
-                    <span class="bg-slate-800 text-slate-300 px-2.5 py-1 rounded-lg text-xs font-bold">ממתין לפעולתך...</span>
+        <!-- מסך משחק -->
+        <div id="screen-game" class="hidden" style="display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span id="stage-title" style="color: var(--accent); font-weight: bold; font-size: 0.85rem;">שלב: טרום פלופ</span>
+                <button onclick="backToMenu()" id="ui-btn-back" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.8rem;">🏠 תפריט</button>
+            </div>
+
+            <div class="poker-table-card">
+                <div class="opponent opp-1" id="o1">Alex <br><span style="color:var(--text-muted)">-</span></div>
+                <div class="opponent opp-2" id="o2">Sarah <br><span style="color:var(--text-muted)">-</span></div>
+                <div class="opponent opp-3" id="o3">Mike <br><span style="color:var(--text-muted)">-</span></div>
+                <div class="opponent opp-4" id="o4">Ron <br><span style="color:var(--text-muted)">-</span></div>
+                <div class="opponent opp-5" id="o5">Elad <br><span style="color:var(--text-muted)">-</span></div>
+
+                <div class="pot-box"><span id="ui-pot-label">קופה</span>: <span id="pot-size">45</span>$</div>
+                <div class="community-cards" id="community-cards"></div>
+
+                <div class="player-hand-area">
+                    <div id="ui-player-tag" style="font-size: 0.6rem; font-weight: bold; background: rgba(0,0,0,0.7); padding: 1px 6px; border-radius: 4px;">אתה (Button)</div>
+                    <div class="player-cards" id="player-cards"></div>
                 </div>
             </div>
-            <p id="learning-text" class="text-slate-300 text-sm leading-relaxed">
-                היד חולקה במהירות! בחן את הקלפים שלך ואת מצב השחקנים סביב השולחן. בצע את הפעולה שלך כדי להמשיך ברצף היד עד לריבר.
-            </p>
+
+            <div class="action-grid" id="action-controls">
+                <button class="action-btn fold" onclick="playerMove('fold')" id="ui-btn-fold">Fold (קיפול)</button>
+                <button class="action-btn" onclick="playerMove('call')" id="ui-btn-call">Call (השוואה)</button>
+                <button class="action-btn raise" onclick="playerMove('raise')" id="ui-btn-raise">Raise (העלאה)</button>
+                <button class="action-btn rereise" onclick="playerMove('rereise')" id="ui-btn-rereise">3-Bet (רייז-נגדי)</button>
+            </div>
+
+            <div class="feedback-box">
+                <div id="feedback-content">...</div>
+            </div>
         </div>
-    </section>
+
+        <!-- מסך סטטיסטיקות -->
+        <div id="screen-stats" class="hidden" style="display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 id="ui-stats-heading" style="margin:0; font-size:1rem;">📊 סטטיסטיקות אישיות</h3>
+                <button onclick="backToMenu()" id="ui-btn-stats-back" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">חזור</button>
+            </div>
+            <div class="stats-dashboard" id="stats-container"></div>
+        </div>
+
+        <!-- מסך הישגים -->
+        <div id="screen-achievements" class="hidden" style="display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 id="ui-ach-heading" style="margin:0; font-size:1rem;">🏆 הישגים וגביעים</h3>
+                <button onclick="backToMenu()" id="ui-btn-ach-back" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">חזור</button>
+            </div>
+            <div class="achievements-list" id="achievements-container"></div>
+        </div>
+
+    </div>
 
     <script>
         let bankroll = 1000;
@@ -165,11 +353,281 @@
         let deck = [];
         let playerCards = [];
         let communityCards = [];
-        let stage = 0; // 0: Pre-flop, 1: Flop, 2: Turn, 3: River, 4: Showdown
-        let isProcessing = false;
+        let stage = 0;
+        let currentMode = 'career'; 
+        let currentLang = 'he';
+
+        // מעקב סטטיסטיקות
+        let statsData = {
+            totalHands: 0,
+            correctDecisions: 0,
+            puzzlesSolved: 0,
+            chipsWon: 0
+        };
+
+        const translations = {
+            he: {
+                title: "♠ PokerPro Master",
+                menuHeading: "התחל את דרכך למקצוענות",
+                menuSub: "בחר מצב אימון ושפר את כישורי הפוקר שלך",
+                btnCareer: "🎮 משחק קריירה רגיל",
+                btnAdvanced: "⚡ אימון מתקדם (GTO)",
+                btnPuzzle: "🧩 חידת פוקר יומית",
+                btnStats: "📊 לוח סטטיסטיקות וביצועים",
+                btnAch: "🏆 הישגים וגביעים",
+                back: "🏠 תפריט",
+                potLabel: "קופה",
+                playerTag: "אתה (Button)",
+                fold: "Fold (קיפול)",
+                call: "Call (השוואה)",
+                raise: "Raise (העלאה)",
+                rereise: "3-Bet (רייז-נגדי)",
+                stagePre: "שלב: טרום פלופ",
+                stageFlop: "שלב: פלופ",
+                stageTurn: "שלב: טורן",
+                stageRiver: "שלב: ריבר",
+                statsHeading: "📊 סטטיסטיקות ונתוני ביצועים",
+                achHeading: "🏆 הישגים וגביעים",
+                backBtn: "חזור",
+                unlocked: "✅ נפתח",
+                locked: "🔒 נעול",
+                initMsg: "קיבלת יד חדשה. שקל את עוצמת הקלפים והמיקום שלך.",
+                puzzleMsg: "🧩 חידה יומית: אתה ב-Big Blind מול Raise מוקדם. יש לך AQ סוטד. מה תעשה?"
+            },
+            ar: {
+                title: "♠ PokerPro Master",
+                menuHeading: "ابدأ طريقك نحو الاحتراف",
+                menuSub: "اختر وضع التدريب وحسن مهاراتك في البوكر",
+                btnCareer: "🎮 وضع المهنة العادي",
+                btnAdvanced: "⚡ تدريب متقدم (GTO)",
+                btnPuzzle: "🧩 لغز البوكر اليومي",
+                btnStats: "📊 لوحة الإحصائيات والأداء",
+                btnAch: "🏆 الإنجازات والجوائز",
+                back: "🏠 القائمة",
+                potLabel: "الوعاء",
+                playerTag: "أنت (Button)",
+                fold: "طي (Fold)",
+                call: "مكالمة (Call)",
+                raise: "رفع (Raise)",
+                rereise: "إعادة رفع (3-Bet)",
+                stagePre: "المرحلة: ما قبل الفلوب",
+                stageFlop: "المرحلة: الفلوب",
+                stageTurn: "المرحلة: التيرن",
+                stageRiver: "المرحلة: الريفر",
+                statsHeading: "📊 الإحصائيات الشخصية والأداء",
+                achHeading: "🏆 الإنجازات والجوائز",
+                backBtn: "رجوع",
+                unlocked: "✅ مفتوح",
+                locked: "🔒 مقفل",
+                initMsg: "تم توزيع يد جديدة. قم بتقييم أوراقك وموقعك.",
+                puzzleMsg: "🧩 لغز يومي: أنت في الـ BB ضد رفع مبكر. معك AQ suited. ماذا ستفعل؟"
+            },
+            en: {
+                title: "♠ PokerPro Master",
+                menuHeading: "Start Your Pro Journey",
+                menuSub: "Choose a training mode and sharpen your skills",
+                btnCareer: "🎮 Standard Career Mode",
+                btnAdvanced: "⚡ Advanced Training (GTO)",
+                btnPuzzle: "🧩 Daily Poker Puzzle",
+                btnStats: "📊 Stats & Analytics Dashboard",
+                btnAch: "🏆 Achievements",
+                back: "🏠 Menu",
+                potLabel: "Pot",
+                playerTag: "You (Button)",
+                fold: "Fold",
+                call: "Call",
+                raise: "Raise",
+                rereise: "3-Bet",
+                stagePre: "Stage: Pre-Flop",
+                stageFlop: "Stage: Flop",
+                stageTurn: "Stage: Turn",
+                stageRiver: "Stage: River",
+                statsHeading: "📊 Performance Statistics",
+                achHeading: "🏆 Achievements",
+                backBtn: "Back",
+                unlocked: "✅ Unlocked",
+                locked: "🔒 Locked",
+                initMsg: "New hand dealt. Evaluate your cards and position.",
+                puzzleMsg: "🧩 Daily Puzzle: You're in BB facing an early raise with AQ suited. What do you do?"
+            },
+            ru: {
+                title: "♠ PokerPro Master",
+                menuHeading: "Начните путь к профессионализму",
+                menuSub: "Выберите режим тренировки и улучшайте навыки",
+                btnCareer: "🎮 Стандартная карьера",
+                btnAdvanced: "⚡ GTO Тренировка",
+                btnPuzzle: "🧩 Ежедневная задачка",
+                btnStats: "📊 Статистика",
+                btnAch: "🏆 Достижения",
+                back: "🏠 Меню",
+                potLabel: "Банк",
+                playerTag: "Вы (Баттон)",
+                fold: "Фолд",
+                call: "Колл",
+                raise: "Рейз",
+                rereise: "3-Бет",
+                stagePre: "Этап: Префлоп",
+                stageFlop: "Этап: Флоп",
+                stageTurn: "Этап: Терн",
+                stageRiver: "Этап: Ривер",
+                statsHeading: "📊 Статистика производительности",
+                achHeading: "🏆 Достижения",
+                backBtn: "Назад",
+                unlocked: "✅ Открыто",
+                locked: "🔒 Закрыто",
+                initMsg: "Раздача началась. Оцените карты.",
+                puzzleMsg: "🧩 Задачка дня: Вы на BB против рейза с AQ suited. Ваши действия?"
+            },
+            es: {
+                title: "♠ PokerPro Master",
+                menuHeading: "Comienza tu camino profesional",
+                menuSub: "Elige un modo de entrenamiento",
+                btnCareer: "🎮 Modo Carrera",
+                btnAdvanced: "⚡ Entrenamiento GTO",
+                btnPuzzle: "🧩 Puzzle Diario",
+                btnStats: "📊 Estadísticas",
+                btnAch: "🏆 Logros",
+                back: "🏠 Menú",
+                potLabel: "Bote",
+                playerTag: "Tú (Botón)",
+                fold: "Fold",
+                call: "Call",
+                raise: "Raise",
+                rereise: "3-Bet",
+                stagePre: "Fase: Pre-Flop",
+                stageFlop: "Fase: Flop",
+                stageTurn: "Fase: Turn",
+                stageRiver: "Fase: River",
+                statsHeading: "📊 Estadísticas de rendimiento",
+                achHeading: "🏆 Logros",
+                backBtn: "Volver",
+                unlocked: "✅ Desbloqueado",
+                locked: "🔒 Bloqueado",
+                initMsg: "Nueva mano. Evalúa tus cartas.",
+                puzzleMsg: "🧩 Puzzle diario: Estás en BB con AQ suited ante un raise temprano. ¿Qué haces?"
+            },
+            zh: {
+                title: "♠ PokerPro Master",
+                menuHeading: "开启您的职业扑克之路",
+                menuSub: "选择训练模式并提升扑克水平",
+                btnCareer: "🎮 标准职业模式",
+                btnAdvanced: "⚡ 高级GTO训练",
+                btnPuzzle: "🧩 每日扑克谜题",
+                btnStats: "📊 统计与数据看板",
+                btnAch: "🏆 成就奖杯",
+                back: "🏠 菜单",
+                potLabel: "底池",
+                playerTag: "你 (Button)",
+                fold: "弃牌 (Fold)",
+                call: "跟注 (Call)",
+                raise: "加注 (Raise)",
+                rereise: "再加注 (3-Bet)",
+                stagePre: "阶段：翻牌前",
+                stageFlop: "阶段：翻牌圈",
+                stageTurn: "阶段：转牌圈",
+                stageRiver: "阶段：河牌圈",
+                statsHeading: "📊 个人数据与表现",
+                achHeading: "🏆 成就与奖杯",
+                backBtn: "返回",
+                unlocked: "✅ 已解锁",
+                locked: "🔒 未解锁",
+                initMsg: "新牌局已发。请评估手牌与位置。",
+                puzzleMsg: "🧩 每日谜题：你在大盲位(BB)面对前位加注，手牌是AQ同花。你该怎么做？"
+            }
+        };
+
+        let achievements = [
+            { id: 'first_win', name: {he:'צעד ראשון', ar:'الخطوة الأولى', en:'First Step', ru:'Первый шаг', es:'Primer paso', zh:'第一步'}, desc: {he:'נצח ביד הראשונה', ar:'فز باليد الأولى', en:'Win first hand', ru:'Выиграть раздачу', es:'Ganar mano', zh:'赢得第一手'}, unlocked: false },
+            { id: 'puzzle_master', name: {he:'פתר החידות', ar:'حلال الألغاز', en:'Puzzle Solver', ru:'Решатель задач', es:'Solucionador', zh:'解谜达人'}, desc: {he:'פתר את חידת הפוקר היומית', ar:'حل لغز البوكر اليومي', en:'Solve daily puzzle', ru:'Решить задачку', es:'Resolver puzzle', zh:'完成每日谜题'}, unlocked: false },
+            { id: 'high_roller', name: {he:'היי רולר', ar:'لاعب كبير', en:'High Roller', ru:'Хайроллер', es:'High Roller', zh:'高额玩家'}, desc: {he:'הגע ל-1,500$', ar:'الوصول إلى 1,500$', en:'Reach $1,500', ru:'Достичь $1500', es:'Alcanzar $1,500', zh:'达到 $1,500'}, unlocked: false },
+            { id: 'shark', name: {he:'כריש פוקר', ar:'قرش البوكر', en:'Poker Shark', ru:'Акула покера', es:'Tiburón', zh:'扑克鲨鱼'}, desc: {he:'שמור על דיוק גבוה בסטטיסטיקות', ar:'حافظ على دقة عالية', en:'Maintain high accuracy', ru:'Высокая точность', es:'Alta precisión', zh:'保持高准确率'}, unlocked: false }
+        ];
 
         const suits = ['♠', '♣', '♥', '♦'];
         const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+
+        function changeLanguage(lang) {
+            currentLang = lang;
+            const root = document.getElementById('html-root');
+            root.setAttribute('lang', lang);
+            root.setAttribute('dir', (lang === 'he' || lang === 'ar') ? 'rtl' : 'ltr');
+            
+            const t = translations[lang];
+            document.getElementById('ui-app-title').innerText = t.title;
+            document.getElementById('ui-menu-heading').innerText = t.menuHeading;
+            document.getElementById('ui-menu-sub').innerText = t.menuSub;
+            document.getElementById('ui-btn-career').innerText = t.btnCareer;
+            document.getElementById('ui-btn-advanced').innerText = t.btnAdvanced;
+            document.getElementById('ui-btn-puzzle').innerText = t.btnPuzzle;
+            document.getElementById('ui-btn-stats').innerText = t.btnStats;
+            document.getElementById('ui-btn-ach').innerText = t.btnAch;
+            document.getElementById('ui-btn-back').innerText = t.back;
+            document.getElementById('ui-pot-label').innerText = t.potLabel;
+            document.getElementById('ui-player-tag').innerText = t.playerTag;
+            document.getElementById('ui-btn-fold').innerText = t.fold;
+            document.getElementById('ui-btn-call').innerText = t.call;
+            document.getElementById('ui-btn-raise').innerText = t.raise;
+            document.getElementById('ui-btn-rereise').innerText = t.rereise;
+            document.getElementById('ui-stats-heading').innerText = t.statsHeading;
+            document.getElementById('ui-btn-stats-back').innerText = t.backBtn;
+            document.getElementById('ui-ach-heading').innerText = t.achHeading;
+            document.getElementById('ui-btn-ach-back').innerText = t.backBtn;
+            document.getElementById('ach-count').innerText = achievements.filter(a => a.unlocked).length;
+        }
+
+        function showScreen(screenId) {
+            ['screen-menu', 'screen-game', 'screen-stats', 'screen-achievements'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+        }
+
+        function backToMenu() {
+            showScreen('screen-menu');
+            document.getElementById('ach-count').innerText = achievements.filter(a => a.unlocked).length;
+        }
+
+        function startGameMode(mode) {
+            currentMode = mode;
+            showScreen('screen-game');
+            startNewHand();
+        }
+
+        function startPuzzleMode() {
+            currentMode = 'puzzle';
+            showScreen('screen-game');
+            startNewHand();
+        }
+
+        function showStats() {
+            showScreen('screen-stats');
+            const c = document.getElementById('stats-container');
+            let accuracy = statsData.totalHands > 0 ? Math.round((statsData.correctDecisions / statsData.totalHands) * 100) : 100;
+            c.innerHTML = `
+                <div class="stat-card-item"><span>סה"כ ידיים ששיחקתי:</span> <b>${statsData.totalHands}</b></div>
+                <div class="stat-card-item"><span>אחוז דיוק והחלטות GTO:</span> <b style="color:var(--accent-green);">${accuracy}%</b></div>
+                <div class="stat-card-item"><span>חידות יומיות שנפתרו:</span> <b>${statsData.puzzlesSolved}</b></div>
+                <div class="stat-card-item"><span>צ'יפס מצטבר שהורווח:</span> <b style="color:var(--accent-gold);">${statsData.chipsWon}$</b></div>
+            `;
+        }
+
+        function showAchievements() {
+            showScreen('screen-achievements');
+            const container = document.getElementById('achievements-container');
+            container.innerHTML = '';
+            const t = translations[currentLang];
+            achievements.forEach(ach => {
+                container.innerHTML += `
+                    <div class="achievement-item" style="border-color: ${ach.unlocked ? 'var(--accent-green)' : '#334155'}">
+                        <div>
+                            <b>${ach.name[currentLang]}</b><br>
+                            <span style="font-size:0.75rem; color:var(--text-muted);">${ach.desc[currentLang]}</span>
+                        </div>
+                        <div>${ach.unlocked ? t.unlocked : t.locked}</div>
+                    </div>
+                `;
+            });
+        }
 
         function createDeck() {
             deck = [];
@@ -182,191 +640,165 @@
         }
 
         function startNewHand() {
-            if (bankroll <= 0) {
-                alert("נגמרו לך הצ'יפסים! החשבון אופס אוטומטית ל-1000$.");
-                bankroll = 1000;
-            }
+            if (bankroll <= 0) { bankroll = 1000; }
             createDeck();
             pot = 45;
             currentBet = 15;
             stage = 0;
-            isProcessing = false;
+            
+            const t = translations[currentLang];
+            document.getElementById('stage-title').innerText = t.stagePre + (currentMode === 'puzzle' ? ' [PUZZLE]' : '');
+            document.getElementById('action-controls').style.display = 'grid';
 
-            document.getElementById('game-stage').innerText = "טרום פלופ (Pre-Flop)";
-            document.getElementById('action-controls').style.display = 'flex';
-
-            playerCards = [deck.pop(), deck.pop()];
-            communityCards = [];
-
-            simulateOpponentsActions("Pre-Flop");
-            renderCards();
-            updateStats();
-
-            document.getElementById('rating-badge-container').innerHTML = `<span class="bg-slate-800 text-slate-300 px-2.5 py-1 rounded-lg text-xs font-bold">ממתין לפעולה</span>`;
-            document.getElementById('learning-text').innerHTML = 
-                `היד חולקה בזריזות! אתה במיקום Button. היריבים סביב השולחן כבר הגיבו לבליינדים. מה תרצה לעשות?`;
-        }
-
-        function simulateOpponentsActions(stageName) {
-            const possibleActions = ['Fold', 'Call', 'Raise', '3-Bet'];
-            for (let i = 1; i <= 6; i++) {
-                let oppEl = document.getElementById(`opp-${i}`);
-                oppEl.classList.remove('opacity-30', 'grayscale');
-                let statusEl = oppEl.querySelector('.opp-status');
-                
-                let rand = Math.random();
-                if (rand < 0.3) {
-                    oppEl.classList.add('opacity-30', 'grayscale');
-                    statusEl.style.color = "#ef4444";
-                    statusEl.innerText = "Fold (קיפל)";
-                } else if (rand < 0.65) {
-                    statusEl.style.color = "#38bdf8";
-                    statusEl.innerText = "Call (השווה)";
-                } else if (rand < 0.9) {
-                    statusEl.style.color = "#22c55e";
-                    statusEl.innerText = "Raise (העלה)";
-                    pot += 15;
-                } else {
-                    statusEl.style.color = "#a855f7";
-                    statusEl.innerText = "3-Bet (רייז-נגדי)";
-                    pot += 30;
-                }
+            if (currentMode === 'puzzle') {
+                playerCards = [{ val: 'A', suit: '♠', isRed: false }, { val: 'Q', suit: '♠', isRed: false }];
+                communityCards = [];
+            } else {
+                playerCards = [deck.pop(), deck.pop()];
+                communityCards = [];
             }
-            updateStats();
-        }
 
-        function renderCards() {
-            const pContainer = document.getElementById('player-cards');
-            pContainer.innerHTML = '';
-            playerCards.forEach(c => pContainer.appendChild(createCardElement(c)));
-
-            const cContainer = document.getElementById('community-cards');
-            cContainer.innerHTML = '';
-            communityCards.forEach(c => cContainer.appendChild(createCardElement(c)));
-        }
-
-        function createCardElement(card) {
-            const div = document.createElement('div');
-            div.className = `card w-12 h-16 md:w-14 md:h-20 bg-white rounded-lg flex flex-col justify-between p-1 font-bold text-xs md:text-sm shadow-md ${card.isRed ? 'text-red-600' : 'text-slate-900'}`;
-            div.innerHTML = `<span>${card.val}</span><span class="text-center text-lg md:text-xl">${card.suit}</span><span class="transform rotate-180">${card.val}</span>`;
-            return div;
-        }
-
-        function updateStats() {
+            simulateOpponents();
+            renderTable();
             document.getElementById('bankroll').innerText = bankroll;
+
+            document.getElementById('feedback-content').innerHTML = currentMode === 'puzzle' ? t.puzzleMsg : t.initMsg;
+        }
+
+        function simulateOpponents() {
+            for(let i=1; i<=5; i++) {
+                let op = document.getElementById(`o${i}`);
+                op.classList.remove('folded');
+                let span = op.querySelector('span');
+                let r = Math.random();
+                if (r < 0.3) { op.classList.add('folded'); span.style.color = "var(--accent-red)"; span.innerText = "Fold"; }
+                else if (r < 0.7) { span.style.color = "var(--accent)"; span.innerText = "Call"; }
+                else { span.style.color = "var(--accent-green)"; span.innerText = "Raise"; }
+            }
+        }
+
+        function renderTable() {
+            const pC = document.getElementById('player-cards');
+            pC.innerHTML = '';
+            playerCards.forEach(c => pC.appendChild(createCardEl(c)));
+
+            const cC = document.getElementById('community-cards');
+            cC.innerHTML = '';
+            communityCards.forEach(c => cC.appendChild(createCardEl(c)));
+
             document.getElementById('pot-size').innerText = pot;
         }
 
-        function evaluateAction(action) {
-            let isHighCard = playerCards[0].val === 'A' || playerCards[0].val === 'K' || playerCards[1].val === 'A' || playerCards[1].val === 'K';
-            let isPair = playerCards[0].val === playerCards[1].val;
-
-            let badgeHtml = "";
-            let feedback = "";
-
-            if (action === 'raise' || action === 'rereise') {
-                if (isPair || isHighCard) {
-                    badgeHtml = `<span class="bg-emerald-600 text-white px-2.5 py-1 rounded-lg text-xs font-bold">דירוג: מצוין (A+)</span>`;
-                    feedback = "פעולה אגרסיבית מצוינת! ניצלת את המיקום המאוחר שלך ואת החוזק של היד כדי לבנות קופה גדולה.";
-                } else {
-                    badgeHtml = `<span class="bg-sky-600 text-white px-2.5 py-1 rounded-lg text-xs font-bold">דירוג: סביר בבלוף (B)</span>`;
-                    feedback = "הפגנת אגרסיביות עם יד יחסית חלשה. מהלך כזה דורש מעקב אחרי תגובות היריבים.";
-                }
-            } else if (action === 'call') {
-                if (isPair || isHighCard) {
-                    badgeHtml = `<span class="bg-blue-600 text-white px-2.5 py-1 rounded-lg text-xs font-bold">דירוג: טוב (B+)</span>`;
-                    feedback = "השווית בבטחה וראית את הקלפים הבאים. שקול להעלות בפעמים הבאות עם קלפים גבוהים.";
-                } else {
-                    badgeHtml = `<span class="bg-red-600 text-white px-2.5 py-1 rounded-lg text-xs font-bold">דירוג: טעות פסיבית (C)</span>`;
-                    feedback = "השווית עם קלפים חלשים מדי ללא זוג או קלף גבוה. עדיף היה לקפל.";
-                }
-            } else { // Fold
-                if (!isPair && !isHighCard) {
-                    badgeHtml = `<span class="bg-emerald-600 text-white px-2.5 py-1 rounded-lg text-xs font-bold">דירוג: מצוין (A)</span>`;
-                    feedback = "פרישה חכמה! זיהית קלפים חסרי סיכוי וחסרת צ'יפסים יקרים.";
-                } else {
-                    badgeHtml = `<span class="bg-amber-600 text-white px-2.5 py-1 rounded-lg text-xs font-bold">דירוג: פספוס יד טובה (D)</span>`;
-                    feedback = "קיפלת ידיים חזקות שיכלו להגיע לשואודאון בקלות.";
-                }
-            }
-            return { badgeHtml, feedback };
+        function createCardEl(card) {
+            const d = document.createElement('div');
+            d.className = `card ${card.isRed ? 'red' : ''}`;
+            d.innerHTML = `<span>${card.val}</span><span style="text-align:center;">${card.suit}</span><span style="transform: rotate(180deg);">${card.val}</span>`;
+            return d;
         }
 
-        function handlePlayerAction(action) {
-            if (isProcessing) return;
-            isProcessing = true;
+        function playerMove(action) {
+            statsData.totalHands++;
+            let isHigh = playerCards[0].val === 'A' || playerCards[0].val === 'K' || playerCards[1].val === 'A' || playerCards[1].val === 'K';
+            let isPair = playerCards[0].val === playerCards[1].val;
+            
+            let ratingHTML = "";
+            let text = "";
 
-            let evalResult = evaluateAction(action);
-            document.getElementById('rating-badge-container').innerHTML = evalResult.badgeHtml;
-            document.getElementById('learning-text').innerHTML = evalResult.feedback;
+            if (currentMode === 'puzzle') {
+                if (action === 'rereise' || action === 'raise') {
+                    ratingHTML = `<span class="rating-tag rate-exc">Puzzle Solved! (A+)</span>`;
+                    text = "פתרון מעולה לחידה! עם AQ סוטד מול העלאה מוקדמת, ביצוע 3-Bet הוא המהלך המומלץ ביותר ב-GTO.";
+                    statsData.correctDecisions++;
+                    statsData.puzzlesSolved++;
+                    achievements[1].unlocked = true; // Puzzle Master
+                } else {
+                    ratingHTML = `<span class="rating-tag rate-bad">Wrong Move (C)</span>`;
+                    text = "פספוס בחידה. ביד כזו חזקה עדיף להפעיל אגרסיביות ולא לפרוש או רק להשוות.";
+                }
+            } else {
+                if (action === 'raise' || action === 'rereise') {
+                    if (isHigh || isPair) {
+                        ratingHTML = `<span class="rating-tag rate-exc">דירוג: מצוין (A+)</span>`;
+                        text = "מהלך אגרסיבי מושלם!";
+                        statsData.correctDecisions++;
+                    } else {
+                        ratingHTML = `<span class="rating-tag rate-good">דירוג: סביר (B)</span>`;
+                        text = "ניסיון לחץ טוב.";
+                    }
+                } else if (action === 'call') {
+                    if (isHigh || isPair) {
+                        ratingHTML = `<span class="rating-tag rate-good">דירוג: סביר (B+)</span>`;
+                        text = "השווות בבטחה.";
+                        statsData.correctDecisions++;
+                    } else {
+                        ratingHTML = `<span class="rating-tag rate-bad">דירוג: טעות (C)</span>`;
+                        text = "השוואה עם יד חלשה.";
+                    }
+                } else {
+                    if (!isHigh && !isPair) {
+                        ratingHTML = `<span class="rating-tag rate-exc">דירוג: מצוין (A)</span>`;
+                        text = "קיפול מעולה שחסך צ'יפסים.";
+                        statsData.correctDecisions++;
+                    } else {
+                        ratingHTML = `<span class="rating-tag rate-bad">דירוג: פספוס (D)</span>`;
+                        text = "קיפלת יד טובה.";
+                    }
+                }
+            }
+
+            document.getElementById('feedback-content').innerHTML = `${ratingHTML}<br>${text}`;
 
             if (action === 'fold') {
-                bankroll -= 15;
-                updateStats();
-                setTimeout(startNewHand, 2500);
-                return;
-            } else if (action === 'call') {
-                pot += currentBet;
-            } else if (action === 'raise') {
-                pot += currentBet * 2;
-                currentBet *= 2;
-            } else if (action === 'rereise') {
-                pot += currentBet * 3;
-                currentBet *= 3;
+                bankroll -= currentBet;
+                endHand(false);
+            } else {
+                if (action === 'call') pot += currentBet;
+                if (action === 'raise') { pot += currentBet * 2; currentBet *= 2; }
+                if (action === 'rereise') { pot += currentBet * 3; currentBet *= 3; }
+                advanceStage();
             }
-
-            updateStats();
-
-            // Automatic fast progression through board stages
-            setTimeout(advanceGameStage, 1500);
         }
 
-        function advanceGameStage() {
+        function advanceStage() {
             stage++;
+            const t = translations[currentLang];
             if (stage === 1) {
                 communityCards.push(deck.pop(), deck.pop(), deck.pop());
-                document.getElementById('game-stage').innerText = "פלופ (Flop)";
+                document.getElementById('stage-title').innerText = t.stageFlop;
             } else if (stage === 2) {
                 communityCards.push(deck.pop());
-                document.getElementById('game-stage').innerText = "טורן (Turn)";
+                document.getElementById('stage-title').innerText = t.stageTurn;
             } else if (stage === 3) {
                 communityCards.push(deck.pop());
-                document.getElementById('game-stage').innerText = "ריבר (River)";
+                document.getElementById('stage-title').innerText = t.stageRiver;
             } else if (stage === 4) {
-                triggerShowdown();
+                endHand(true);
                 return;
             }
-
-            renderCards();
-            simulateOpponentsActions(stage);
-
-            if (stage < 3) {
-                // Automatically keep flowing or wait for next quick stage trigger
-                setTimeout(() => { isProcessing = false; }, 800);
-            } else {
-                setTimeout(triggerShowdown, 2000);
-            }
+            renderTable();
         }
 
-        function triggerShowdown() {
-            document.getElementById('game-stage').innerText = "שואודאון (Showdown)";
-            let won = Math.random() > 0.45;
-            if (won) {
-                bankroll += pot;
-                document.getElementById('learning-text').innerHTML += `<br><br>🏆 <b>תוצאה: ניצחת בקופה (${pot}$!)</b> היד שלך גברה על היריבים בשולחן.`;
-            } else {
-                bankroll -= currentBet;
-                document.getElementById('learning-text').innerHTML += `<br><br>💥 <b>תוצאה: היריב הציג יד חזקה יותר.</b> הפסדת את הסיבוב הנוכחי.`;
-            }
-            updateStats();
+        function endHand(reachedShowdown) {
             document.getElementById('action-controls').style.display = 'none';
-            setTimeout(startNewHand, 4000);
+            if (reachedShowdown) {
+                let won = Math.random() > 0.4;
+                if (won) {
+                    bankroll += pot;
+                    statsData.chipsWon += pot;
+                    document.getElementById('feedback-content').innerHTML += `<br><br>🏆 <b>ניצחת בקופה של ${pot}$!</b>`;
+                    achievements[0].unlocked = true;
+                    if (bankroll >= 1500) achievements[2].unlocked = true;
+                    if (statsData.correctDecisions >= 3) achievements[3].unlocked = true;
+                } else {
+                    bankroll -= currentBet;
+                    document.getElementById('feedback-content').innerHTML += `<br><br>💥 <b>היריב תפס יד חזקה יותר.</b>`;
+                }
+            }
+            document.getElementById('bankroll').innerText = bankroll;
+            setTimeout(startNewHand, 5000);
         }
 
-        // Initialize the first hand on window load
-        window.onload = function() {
-            startNewHand();
-        }
+        changeLanguage('he');
     </script>
 </body>
 </html>
