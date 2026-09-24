@@ -384,7 +384,7 @@
                 <button onclick="backToMenu()" style="background:none; border:none; color:var(--text-muted); cursor:pointer;">חזור</button>
             </div>
             <div class="settings-box">
-                <p style="margin:0; font-size: 0.8rem; color: var(--text-muted);">הכנס את מפתח ה-Google Gemini API שלך[span_0](start_span)[span_0](end_span) כדי לאפשר למאמן ה-AI לענות לך בצורה חיה. המפתח נשמר בדפדפן שלך בלבד[span_1](start_span)[span_1](end_span).</p>
+                <p style="margin:0; font-size: 0.8rem; color: var(--text-muted);">הכנס את מפתח ה-Google Gemini API שלך כדי לאפשר למאמן ה-AI לענות לך בצורה חיה. המפתח נשמר בדפדפן שלך בלבד.</p>
                 <input type="password" id="user-api-key-input" placeholder="הדבק כאן את מפתח ה-API שלך...">
                 <button class="menu-btn" onclick="saveApiKey()" style="padding: 8px; font-size: 0.8rem;">שמור מפתח</button>
                 <span id="api-save-status" style="font-size: 0.75rem; color: var(--accent-green);"></span>
@@ -1000,12 +1000,12 @@
             history.scrollTop = history.scrollHeight;
 
             try {
-                // שימוש ב-SDK הרשמי של גוגל מונע בעיות CORS ותאימות מודלים
                 const ai = new GoogleGenAI({ apiKey: userApiKey });
                 const prompt = `אתה מאמן פוקר מקצוען. השחקן משחק באפליקציית אימון והעלה את השיקול הבא: "${text}". תן לו ניתוח אסטרטגי מקצועי בגובה העיניים בעברית.`;
 
+                // שימוש במודל המעודכן הנדרש
                 const response = await ai.models.generateContent({
-                    model: 'gemini-2.5-flash',
+                    model: 'gemini-3.8-flash',
                     contents: prompt,
                 });
 
